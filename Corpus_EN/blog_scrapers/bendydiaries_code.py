@@ -76,15 +76,16 @@ def download_post(url):
 
     return title, text
 
-# Function to save an article as a .txt file
+# Function to save an article as a .txt file (sem usar with)
 def save_article(title, text, index):
     # Make a safe filename from the title (alphanumeric + some punctuation)
     safe_title = "".join(c for c in title if c.isalnum() or c in " _-").rstrip()
     filename = os.path.join(OUTPUT_FOLDER, f"{index:03d}_{safe_title}.txt")
 
-    # Write title and content to the file
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(title + "\n\n" + text)
+    # Abrir, escrever e fechar arquivo manualmente
+    f = open(filename, "w", encoding="utf-8")
+    f.write(title + "\n\n" + text)
+    f.close()
     
     print(f"Saved: {filename}")
 
