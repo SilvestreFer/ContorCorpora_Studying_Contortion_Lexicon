@@ -26,7 +26,7 @@ def save_article(url, destination_folder, filename):
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(text)
 
-    print(f"✅ Article saved: {filename}")
+    print(f"Article saved: {filename}")
 
 # Main blog URL to scrape articles from
 blog_url = "https://www.ashrexcircus.com/blog"
