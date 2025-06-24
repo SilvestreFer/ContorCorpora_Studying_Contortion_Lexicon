@@ -2,7 +2,7 @@ import os
 import requests
 from bs4 import BeautifulSoup
 
-# List of URLs
+# List of URLs to extract text from
 urls = [
     "https://holoart.com.br/contor-lab/",
     "https://omenorespetaculodaterra.blogspot.com/2010/05/contorcionista-o-contorcionismo-ou.html",
@@ -12,40 +12,35 @@ urls = [
     "https://dominiquemartins.wordpress.com/"
 ]
 
-# Directory to store the text files
+# Folder where the text files will be saved
 output_dir = "../articles"
 os.makedirs(output_dir, exist_ok=True)
 
-# Function to extract and clean text
+# Function to extract clean text from a URL
 def extract_text(url):
-    try:
-        headers = {"User-Agent": "Mozilla/5.0"}
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
+    headers = {"User-Agent": "Mozilla/5.0"}
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()  # Raises an error if the request failed
 
-        soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(response.text, "html.parser")
 
-        # Remove scripts and styles
-        for script_or_style in soup(["script", "style", "noscript"]):
-            script_or_style.decompose()
+    # Remove script, style, and noscript tags
+    for tag in soup(["script", "style", "noscript"]):
+        tag.decompose()
 
-        # Extract visible text
-        text = soup.get_text(separator="\n")
-        cleaned_lines = [line.strip() for line in text.splitlines() if line.strip()]
-        cleaned_text = "\n".join(cleaned_lines)
+    # Get visible text and remove empty lines
+    text = soup.get_text(separator="\n")
+    cleaned_lines = [line.strip() for line in text.splitlines() if line.strip()]
+    cleaned_text = "\n".join(cleaned_lines)
 
-        return cleaned_text
-    except Exception as e:
-        print(f"Error extracting {url}: {e}")
-        return ""
+    return cleaned_text
 
-# Process each URL
+# Loop through each URL, extract text, and save to a file
 for idx, url in enumerate(urls, start=1):
     text = extract_text(url)
-    if text:
-        file_name = f"text_{idx}.txt"
-        with open(os.path.join(output_dir, file_name), "w", encoding="utf-8") as f:
-            f.write(f"URL: {url}\n\n")
-            f.write(text)
+    file_name = f"text_{idx}.txt"
+    with open(os.path.join(output_dir, file_name), "w", encoding="utf-8") as f:
+        f.write(f"URL: {url}\n\n")
+        f.write(text)
 
 print("Text extraction complete. Files saved in the 'articles/' folder.")
