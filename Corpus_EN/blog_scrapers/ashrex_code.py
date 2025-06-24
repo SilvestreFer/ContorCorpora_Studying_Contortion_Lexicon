@@ -3,42 +3,52 @@ from bs4 import BeautifulSoup
 import html2text
 import os
 
-# Função para baixar e salvar texto de um artigo
-def salvar_artigo(url, pasta_destino, nome_arquivo):
-    resposta = requests.get(url)
-    soup = BeautifulSoup(resposta.text, 'html.parser')
+# Function to download and save the text of an article
+def save_article(url, destination_folder, filename):
+    # Send a GET request to the article's URL
+    response = requests.get(url)
+    
+    # Parse the HTML content of the response using BeautifulSoup
+    soup = BeautifulSoup(response.text, 'html.parser')
+    
+    # Convert HTML content to plain text using html2text
+    converter = html2text.HTML2Text()
+    converter.ignore_links = True  # Removes hyperlinks, keeping only text content
+    text = converter.handle(str(soup))
+    
+    # Create the destination folder if it doesn't already exist
+    os.makedirs(destination_folder, exist_ok=True)
+    
+    # Define the full path to save the .txt file
+    filepath = os.path.join(destination_folder, filename)
+    
+    # Save the text content into a UTF-8 encoded file
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(text)
 
-    # Converte o HTML para texto
-    h = html2text.HTML2Text()
-    h.ignore_links = True
-    texto = h.handle(str(soup))
+    print(f"✅ Article saved: {filename}")
 
-    # Cria a pasta se não existir
-    os.makedirs(pasta_destino, exist_ok=True)
+# Main blog URL to scrape articles from
+blog_url = "https://www.ashrexcircus.com/blog"
 
-    # Salva o texto num arquivo .txt
-    caminho = os.path.join(pasta_destino, nome_arquivo)
-    with open(caminho, 'w', encoding='utf-8') as f:
-        f.write(texto)
+# Send a request to the blog page
+response = requests.get(blog_url)
+soup = BeautifulSoup(response.text, 'html.parser')
 
-    print(f"✅ Artigo salvo: {nome_arquivo}")
-
-# URL principal do blog
-url_blog = "https://www.ashrexcircus.com/blog"
-resposta = requests.get(url_blog)
-soup = BeautifulSoup(resposta.text, 'html.parser')
-
-# Encontra os links dos artigos
+# Find all hyperlinks (anchor tags with href attributes)
 links = soup.find_all('a', href=True)
-urls_artigos = []
+article_urls = []
 
+# Filter valid blog post URLs
 for link in links:
     href = link['href']
+    # Look for internal blog links starting with /blog/
     if '/blog/' in href and href.startswith('/blog/'):
-        url_completa = "https://www.ashrexcircus.com" + href
-        if url_completa not in urls_artigos:
-            urls_artigos.append(url_completa)
+        full_url = "https://www.ashrexcircus.com" + href
+        # Avoid duplicates
+        if full_url not in article_urls:
+            article_urls.append(full_url)
 
-# Baixa e salva os artigos
-for i, url in enumerate(urls_artigos):
-    salvar_artigo(url, 'ashrex_articles', f'ashrexcircus_{i+1}.txt')
+# Download and save all filtered articles
+for i, url in enumerate(article_urls):
+    save_article(url, 'ashrex_articles', f'ashrexcircus_{i+1}.txt')
