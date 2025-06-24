@@ -49,7 +49,7 @@ def get_posts_links(page_num):
 
 # Function to download the contents of a single blog post
 def download_post(url):
-    print(f"📄 Downloading article: {url}")
+    print(f"Downloading article: {url}")
     resp = requests.get(url)
 
     # If the request fails, return nothing
