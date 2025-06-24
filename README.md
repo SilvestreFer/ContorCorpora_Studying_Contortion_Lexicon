@@ -1,11 +1,16 @@
-# ContorCorpora: contortion-corpus
+📚 ContorCorpora: A Contortion-Focused Text Corpus
+ContorCorpora is a web scraping and data processing project designed to collect, clean, and compile textual data from online sources focused on contortion, flexibility, and stretching techniques. The resulting corpora support research in linguistics, natural language processing (NLP), and corpus studies.
 
-A web scraping project to collect and build a corpus from blog articles focused on contortion, flexibility, and stretching techniques.
+🎯 Goals
+Automatically extract high-quality textual data from contortion-centered web sources
+Process and clean the data for linguistic consistency and usability
+Store the corpora in structured and accessible formats for analysis
 
-## Sources
-- [Daniwinks Flexibility Blog](https://www.daniwinksflexibility.com/bendy-blog)
-- [Bendy Diaries (WordPress)](https://bendydiaries.wordpress.com/)
-- [Catie Brier's Flexibility Articles](https://www.catiebrier.com/flexibility-articles)
+🛠️ Use Case
+This repository serves as the technical documentation for the corpus compilation component of my final project in the course Computational Linguistics. 
+It includes Python scripts for:
+- Data extraction (web scraping and audio transcription)
+- Preprocessing and cleaning
+- Text organization and export
 
-## Goal
-To extract, clean, and store high-quality text from flexibility-focused blogs, enabling future analysis in NLP, linguistics, or corpus studies.
+The project includes both English and Portuguese corpora, used as primary datasets for the final course report.
