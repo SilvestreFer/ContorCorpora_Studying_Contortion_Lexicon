@@ -1,4 +1,4 @@
-**📚 ContorCorpora: A Contortion-Focused Text Corpus**
+# **📚 ContorCorpora: A Contortion-Focused Text Corpus**
 
 ContorCorpora is a web scraping and data processing project designed to collect, clean, and compile textual data from online sources focused on contortion, flexibility, and stretching techniques. The resulting corpora support research in linguistics, natural language processing (NLP), and corpus studies.
 
