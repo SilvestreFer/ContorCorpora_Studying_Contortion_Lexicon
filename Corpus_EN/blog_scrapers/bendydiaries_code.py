@@ -19,12 +19,12 @@ if not os.path.exists(OUTPUT_FOLDER):
 # Function to extract all blog post links from a specific page number
 def get_posts_links(page_num):
     url = f"{BASE_URL}/page/{page_num}/"
-    print(f"🔎 Fetching post links from page {page_num}: {url}")
+    print(f"Fetching post links from page {page_num}: {url}")
     resp = requests.get(url)
     
     # If the request fails, skip this page
     if resp.status_code != 200:
-        print(f"⚠️ Could not access page {page_num}")
+        print(f"Could not access page {page_num}")
         return []
 
     # Parse HTML content
@@ -54,7 +54,7 @@ def download_post(url):
 
     # If the request fails, return nothing
     if resp.status_code != 200:
-        print(f"⚠️ Error accessing the article: {url}")
+        print(f"Error accessing the article: {url}")
         return None
 
     # Parse HTML content
@@ -67,7 +67,7 @@ def download_post(url):
     # Extract the main content from <div class="entry-content">
     content_div = soup.find("div", class_="entry-content")
     if not content_div:
-        print(f"⚠️ Content not found in article: {url}")
+        print(f"Content not found in article: {url}")
         return None
 
     # Extract text from all paragraphs within the content div
@@ -86,7 +86,7 @@ def save_article(title, text, index):
     with open(filename, "w", encoding="utf-8") as f:
         f.write(title + "\n\n" + text)
     
-    print(f"✅ Saved: {filename}")
+    print(f"Saved: {filename}")
 
 # Main execution flow
 def main():
@@ -97,13 +97,13 @@ def main():
     while True:
         links = get_posts_links(page_num)
         if not links:
-            print("🚫 No more articles found. Stopping.")
+            print("No more articles found. Stopping.")
             break
         all_links.extend(links)
         page_num += 1
         time.sleep(DELAY_BETWEEN_REQUESTS)  # Wait between requests to be polite to the server
 
-    print(f"\n🔖 Total articles collected: {len(all_links)}")
+    print(f"\nTotal articles collected: {len(all_links)}")
 
     # Download and save each article
     for i, link in enumerate(all_links, 1):
@@ -113,7 +113,7 @@ def main():
             save_article(title, text, i)
         time.sleep(DELAY_BETWEEN_REQUESTS)  # Wait again to avoid server overload
 
-    print("\n🏁 All articles have been downloaded and saved.")
+    print("\nAll articles have been downloaded and saved.")
 
 # Entry point
 if __name__ == "__main__":
