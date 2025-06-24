@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import os
 import re
 
+# List of URL to scrape
 urls = [
     "https://www.daniwinksflexibility.com/bendy-blog/build-a-better-hip-flexor-stretch",
     "https://www.daniwinksflexibility.com/bendy-blog/how-to-pnf-stretch-for-splits",
@@ -86,38 +87,35 @@ urls = [
     "https://www.daniwinksflexibility.com/bendy-blog/forearmstands-for-beginners"
 ]
 
+# Name of the folder where the text files will be saved
 folder_name = "daniwinks_articles"
-os.makedirs(folder_name, exist_ok=True)
+os.makedirs(folder_name, exist_ok=True)  # Create the folder if it doesn't exist
 
-def article_name(title):
-    return re.sub(r'[^\w\s-]', '', title).strip().lower().replace(' ', '_')
-
+# Loop through all URLs
 for url in urls:
-    try:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.content, 'html.parser')
-
-        # Título
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Extract the blog title (assumes it's in an <h1> tag)
         title_tag = soup.find('h1')
-        title = title_tag.get_text(strip=True) if title_tag else "sem_titulo"
+        if title_tag:
+            title = title_tag.text.strip()
+        else:
+            title = "no-title"
 
-        # Conteúdo principal
-        article_body = soup.find('div', class_='sqs-block-content')
-        if not article_body:
-            article_body = soup.find('article')  # fallback
-
-        paragraphs = article_body.find_all(['p', 'h2', 'h3', 'ul', 'ol']) if article_body else []
-        content = f"# {title}\n\n"
-        for p in paragraphs:
-            content += p.get_text(strip=True) + "\n\n"
-
-        # Salva como .txt
-        filename = f"{article_name(title)}.txt"
-        filepath = os.path.join(folder_name, filename)
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write(content)
-
-        print(f"Artigo salvo: {filename}")
-
-    except Exception as e:
-        print(f"Erro ao processar {url}: {e}")
+        # Use a regex to create a valid filename from the title (alphanumeric and hyphens only)
+        filename = re.sub(r'[^a-zA-Z0-9\- ]', '', title).lower().replace(' ', '-')
+        filepath = os.path.join(folder_name, f"{filename}.txt")
+        
+        # Extract the blog content (assumes it's inside the <div> with class 'sqs-block-content')
+        content_divs = soup.find_all('div', class_='sqs-block-content')
+        content = "\n\n".join(div.get_text(strip=True) for div in content_divs if div.get_text(strip=True))
+        
+        # Save the content to a text file
+        with open(filepath, 'w', encoding='utf-8') as file:
+            file.write(f"Title: {title}\n\n{content}")
+        print(f"Saved: {filepath}")
+    else:
+        print(f"Failed to retrieve: {url}")
+        
