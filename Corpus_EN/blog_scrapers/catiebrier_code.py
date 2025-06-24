@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import os
 import re
 
+# List of blog post URLs to be scraped
 urls = [
     "https://www.catiebrier.com/post/what-to-do-with-your-glutes-in-backbends",
     "https://www.catiebrier.com/post/dizziness-in-backbends-causes-and-solutions",
@@ -24,38 +25,46 @@ urls = [
     "https://www.catiebrier.com/post/how-often-should-you-stretch"
 ]
 
+# Folder to save the downloaded articles
 folder_name = "catiebrier_articles"
 os.makedirs(folder_name, exist_ok=True)
 
+# Function to create a safe filename from the article title
 def article_name(title):
+    # Removes special characters and replaces spaces with underscores
     return re.sub(r'[^\w\s-]', '', title).strip().lower().replace(' ', '_')
 
+# Loop over all URLs to download and save each article
 for url in urls:
     try:
+        # Make the HTTP request to the article page
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
 
-        # Título
+        # Extract the article title (usually inside an <h1> tag)
         title_tag = soup.find('h1')
-        title = title_tag.get_text(strip=True) if title_tag else "sem_titulo"
+        title = title_tag.get_text(strip=True) if title_tag else "untitled"
 
-        # Conteúdo principal
+        # Find the main content area (typically in a div with class 'sqs-block-content')
         article_body = soup.find('div', class_='sqs-block-content')
         if not article_body:
-            article_body = soup.find('article')  # fallback
+            # Fallback in case the main div is not found
+            article_body = soup.find('article')
 
+        # Extract paragraphs and other relevant tags
         paragraphs = article_body.find_all(['p', 'h2', 'h3', 'ul', 'ol']) if article_body else []
         content = f"# {title}\n\n"
         for p in paragraphs:
             content += p.get_text(strip=True) + "\n\n"
 
-        # Salva como .txt
+        # Generate a filename and save the content to a .txt file
         filename = f"{article_name(title)}.txt"
         filepath = os.path.join(folder_name, filename)
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(content)
 
-        print(f"Artigo salvo: {filename}")
+        print(f"Article saved: {filename}")
 
     except Exception as e:
-        print(f"Erro ao processar {url}: {e}")
+        # Handle and report any errors during the scraping process
+        print(f"Error processing {url}: {e}")
